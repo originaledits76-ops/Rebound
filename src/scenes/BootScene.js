@@ -57,31 +57,32 @@ export default class BootScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // Load SVG Icon pack
-        this.load.svg('icon_back', '/icons/icons/back.svg');
-        this.load.svg('icon_delete', '/icons/icons/delete.svg');
-        this.load.svg('icon_duplicate', '/icons/icons/duplicate.svg');
-        this.load.svg('icon_edit', '/icons/icons/edit.svg');
-        this.load.svg('icon_editor', '/icons/icons/edit.svg');
-        this.load.svg('icon_eraser', '/icons/icons/eraser.svg');
-        this.load.svg('icon_home', '/icons/icons/home.svg');
-        this.load.svg('icon_pause', '/icons/icons/pause.svg');
-        this.load.svg('icon_play', '/icons/icons/play.svg');
-        this.load.svg('icon_redo', '/icons/icons/redo.svg');
-        this.load.svg('icon_restart', '/icons/icons/restart.svg');
-        this.load.svg('icon_retry', '/icons/icons/restart.svg');
-        this.load.svg('icon_save', '/icons/icons/save.svg');
-        this.load.svg('icon_settings', '/icons/icons/settings.svg');
-        this.load.svg('icon_skip', '/icons/icons/skip.svg');
-        this.load.svg('icon_fastforward', '/icons/icons/skip.svg');
-        this.load.svg('icon_undo', '/icons/icons/undo.svg');
-        this.load.svg('icon_move', '/icons/icons/edit.svg');
-        this.load.svg('icon_close', '/icons/icons/back.svg');
-        this.load.svg('icon_list', '/icons/icons/settings.svg');
-        this.load.svg('icon_grid', '/icons/icons/settings.svg');
-        this.load.svg('icon_check', '/icons/icons/play.svg');
-        this.load.svg('icon_rotate', '/icons/icons/restart.svg');
-        this.load.svg('icon_resize', '/icons/icons/edit.svg');
-        this.load.svg('icon_add', '/icons/icons/edit.svg');
+        const svgConfig = { svgWidth: 128, svgHeight: 128 };
+        this.load.svg('icon_back', '/icons/back.svg', svgConfig);
+        this.load.svg('icon_delete', '/icons/delete.svg', svgConfig);
+        this.load.svg('icon_duplicate', '/icons/duplicate.svg', svgConfig);
+        this.load.svg('icon_edit', '/icons/edit.svg', svgConfig);
+        this.load.svg('icon_editor', '/icons/edit.svg', svgConfig);
+        this.load.svg('icon_eraser', '/icons/eraser.svg', svgConfig);
+        this.load.svg('icon_home', '/icons/home.svg', svgConfig);
+        this.load.svg('icon_pause', '/icons/pause.svg', svgConfig);
+        this.load.svg('icon_play', '/icons/play.svg', svgConfig);
+        this.load.svg('icon_redo', '/icons/redo.svg', svgConfig);
+        this.load.svg('icon_restart', '/icons/restart.svg', svgConfig);
+        this.load.svg('icon_retry', '/icons/restart.svg', svgConfig);
+        this.load.svg('icon_save', '/icons/save.svg', svgConfig);
+        this.load.svg('icon_settings', '/icons/settings.svg', svgConfig);
+        this.load.svg('icon_skip', '/icons/skip.svg', svgConfig);
+        this.load.svg('icon_fastforward', '/icons/skip.svg', svgConfig);
+        this.load.svg('icon_undo', '/icons/undo.svg', svgConfig);
+        this.load.svg('icon_move', '/icons/edit.svg', svgConfig);
+        this.load.svg('icon_close', '/icons/back.svg', svgConfig);
+        this.load.svg('icon_list', '/icons/settings.svg', svgConfig);
+        this.load.svg('icon_grid', '/icons/settings.svg', svgConfig);
+        this.load.svg('icon_check', '/icons/play.svg', svgConfig);
+        this.load.svg('icon_rotate', '/icons/restart.svg', svgConfig);
+        this.load.svg('icon_resize', '/icons/edit.svg', svgConfig);
+        this.load.svg('icon_add', '/icons/edit.svg', svgConfig);
 
         // Texture generation handles all assets procedurally
         this.load.on('progress', (value) => {
@@ -100,6 +101,9 @@ export default class BootScene extends Phaser.Scene {
     }
 
     generateAllTextures() {
+        // Fallback for any icon textures that failed to load
+        this.generateFallbackIconTextures();
+
         // Star & Coin vector graphics
         this.generateStarGraphic('icon_star', 0xe0b060, true, 80);
         this.generateStarGraphic('icon_star_outline', 0xe0e0e8, false, 80);
@@ -279,5 +283,128 @@ export default class BootScene extends Phaser.Scene {
         g.fillRect(r - 10, r - 3, 20, 6);
         g.generateTexture(key, size, size);
         g.destroy();
+    }
+
+    generateFallbackIconTextures() {
+        const iconKeys = [
+            'icon_back', 'icon_delete', 'icon_duplicate', 'icon_edit', 'icon_editor',
+            'icon_eraser', 'icon_home', 'icon_pause', 'icon_play', 'icon_redo',
+            'icon_restart', 'icon_retry', 'icon_save', 'icon_settings', 'icon_skip',
+            'icon_fastforward', 'icon_undo', 'icon_move', 'icon_close', 'icon_list',
+            'icon_grid', 'icon_check', 'icon_rotate', 'icon_resize', 'icon_add'
+        ];
+
+        const size = 128;
+        const center = size / 2;
+
+        iconKeys.forEach(key => {
+            if (this.textures.exists(key)) {
+                const tex = this.textures.get(key);
+                if (tex && tex.key !== '__MISSING' && tex.getSourceImage() && tex.getSourceImage().width > 0) {
+                    return; // Texture exists and is valid
+                }
+            }
+
+            const g = this.make.graphics({ add: false });
+            g.fillStyle(0xffffff, 1);
+            g.lineStyle(8, 0xffffff, 1);
+
+            if (key.includes('play') || key.includes('check')) {
+                g.beginPath();
+                g.moveTo(42, 32);
+                g.lineTo(96, 64);
+                g.lineTo(42, 96);
+                g.closePath();
+                g.fillPath();
+            } else if (key.includes('pause')) {
+                g.fillRect(38, 34, 20, 60);
+                g.fillRect(70, 34, 20, 60);
+            } else if (key.includes('restart') || key.includes('retry') || key.includes('rotate')) {
+                g.beginPath();
+                g.arc(center, center, 32, 0.4, Math.PI * 1.7, false);
+                g.strokePath();
+                g.beginPath();
+                g.moveTo(88, 20);
+                g.lineTo(104, 38);
+                g.lineTo(80, 48);
+                g.closePath();
+                g.fillPath();
+            } else if (key.includes('home')) {
+                g.beginPath();
+                g.moveTo(center, 28);
+                g.lineTo(100, 64);
+                g.lineTo(84, 64);
+                g.lineTo(84, 98);
+                g.lineTo(44, 98);
+                g.lineTo(44, 64);
+                g.lineTo(28, 64);
+                g.closePath();
+                g.fillPath();
+            } else if (key.includes('back') || key.includes('close')) {
+                g.beginPath();
+                g.moveTo(80, 32);
+                g.lineTo(40, 64);
+                g.lineTo(80, 96);
+                g.strokePath();
+                g.fillRect(40, 58, 52, 12);
+            } else if (key.includes('skip') || key.includes('fastforward')) {
+                g.beginPath();
+                g.moveTo(32, 38);
+                g.lineTo(68, 64);
+                g.lineTo(32, 90);
+                g.closePath();
+                g.fillPath();
+                g.beginPath();
+                g.moveTo(68, 38);
+                g.lineTo(104, 64);
+                g.lineTo(68, 90);
+                g.closePath();
+                g.fillPath();
+            } else if (key.includes('settings') || key.includes('list') || key.includes('grid')) {
+                g.strokeCircle(center, center, 28);
+                g.fillCircle(center, center, 12);
+                for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
+                    const x = center + Math.cos(a) * 36;
+                    const y = center + Math.sin(a) * 36;
+                    g.fillCircle(x, y, 8);
+                }
+            } else if (key.includes('undo')) {
+                g.beginPath();
+                g.arc(68, 72, 30, Math.PI, Math.PI * 1.8, false);
+                g.strokePath();
+                g.beginPath();
+                g.moveTo(38, 42);
+                g.lineTo(28, 72);
+                g.lineTo(58, 68);
+                g.closePath();
+                g.fillPath();
+            } else if (key.includes('redo')) {
+                g.beginPath();
+                g.arc(60, 72, 30, Math.PI * 1.2, Math.PI * 2, false);
+                g.strokePath();
+                g.beginPath();
+                g.moveTo(90, 42);
+                g.lineTo(100, 72);
+                g.lineTo(70, 68);
+                g.closePath();
+                g.fillPath();
+            } else if (key.includes('delete')) {
+                g.strokeRect(40, 48, 48, 54);
+                g.fillRect(32, 36, 64, 10);
+                g.fillRect(52, 28, 24, 8);
+            } else {
+                g.beginPath();
+                g.moveTo(88, 32);
+                g.lineTo(96, 40);
+                g.lineTo(48, 88);
+                g.lineTo(32, 96);
+                g.lineTo(40, 80);
+                g.closePath();
+                g.fillPath();
+            }
+
+            g.generateTexture(key, size, size);
+            g.destroy();
+        });
     }
 }

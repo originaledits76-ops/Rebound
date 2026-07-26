@@ -60,6 +60,7 @@ export default class HUD extends Phaser.GameObjects.Container {
         
         const rIcon = scene.add.image(0, 0, 'icon_retry');
         rIcon.setDisplaySize(40, 40);
+        rIcon.setTint(0x3a3a4a);
         
         this.restartBtn.add([rShadow, rBg, rStroke, rIcon]);
         this.restartBtn.setSize(restartSize, restartSize);
@@ -113,6 +114,7 @@ export default class HUD extends Phaser.GameObjects.Container {
         
         const icon = scene.add.image(0, 0, 'icon_pause');
         icon.setDisplaySize(42, 42);
+        icon.setTint(0x3a3a4a);
         
         this.pauseBtn.add([shadow, bg, stroke, icon]);
         this.pauseBtn.setSize(pauseSize, pauseSize);

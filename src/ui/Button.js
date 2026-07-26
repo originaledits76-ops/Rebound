@@ -92,11 +92,35 @@ export default class Button extends Phaser.GameObjects.Container {
 
         const targetIconKey = icon ? (iconMap[icon] || icon) : null;
 
+        // Calculate tint for icon
+        const parseHex = (colorVal, defaultHex = 0x3a3a4a) => {
+            if (typeof colorVal === 'number') return colorVal;
+            if (typeof colorVal === 'string') {
+                if (colorVal.startsWith('#')) return parseInt(colorVal.slice(1), 16);
+                if (colorVal.startsWith('0x')) return parseInt(colorVal, 16);
+            }
+            return defaultHex;
+        };
+
+        let iconTint = options.iconTint;
+        if (iconTint === undefined) {
+            if (textColor && textColor !== '#111111' && textColor !== '#3a3a4a' && textColor !== '#000000') {
+                iconTint = parseHex(textColor, 0xffffff);
+            } else if (bgColor && bgColor !== 0xffffff) {
+                iconTint = 0xffffff;
+            } else {
+                iconTint = 0x3a3a4a;
+            }
+        }
+
         if (targetIconKey && !text) {
             // Icon-only button: icon occupies ~55-60% of button height
             const iconSize = Math.round(height * 0.58);
             this.iconImg = scene.add.image(0, 0, targetIconKey);
             this.iconImg.setDisplaySize(iconSize, iconSize);
+            if (targetIconKey !== 'icon_star' && targetIconKey !== 'icon_coin') {
+                this.iconImg.setTint(iconTint);
+            }
             elements.push(this.iconImg);
             this.animatableContent.push(this.iconImg);
         } else if (targetIconKey && text) {
@@ -104,6 +128,9 @@ export default class Button extends Phaser.GameObjects.Container {
             const iconSize = Math.round(height * 0.46);
             this.iconImg = scene.add.image(0, 0, targetIconKey);
             this.iconImg.setDisplaySize(iconSize, iconSize);
+            if (targetIconKey !== 'icon_star' && targetIconKey !== 'icon_coin') {
+                this.iconImg.setTint(iconTint);
+            }
 
             this.label = scene.add.text(0, 0, text, {
                 fontFamily: 'Fredoka',
