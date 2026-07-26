@@ -12,11 +12,10 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
         this.setFrictionAir(0.004); // Very gradual momentum decay
         this.setMass(1);
         
+        // Debug Color: Yellow (Spawn/Ball)
+        this.setTint(0xeab308);
+
         this.setDepth(10);
-        
-        // Soft drop shadow
-        this.shadow = scene.add.circle(x, y + 15, 30, 0xd0d0d8, 0.6);
-        this.shadow.setDepth(4);
         
         // Bright, smooth trail
         this.trailEmitter = scene.add.particles(0, 0, 'ball_blue_large', {
@@ -36,12 +35,6 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
         super.preUpdate(time, delta);
         
         if (!this.active) return;
-        
-        // Update shadow
-        if (this.shadow) {
-            this.shadow.setPosition(this.x, this.y + 15);
-            this.shadow.setScale(this.scaleX, this.scaleY);
-        }
         
         const speed = this.body.speed;
         
@@ -78,7 +71,6 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
     
     cleanup() {
         if (this.trailEmitter) this.trailEmitter.destroy();
-        if (this.shadow) this.shadow.destroy();
         this.destroy();
     }
 }

@@ -3,6 +3,7 @@ import Button from '../ui/Button.js';
 import AudioManager from '../managers/AudioManager.js';
 import SceneManager from '../managers/SceneManager.js';
 import CreditManager from '../managers/CreditManager.js';
+import ProgressManager from '../managers/ProgressManager.js';
 
 export default class MenuScene extends Phaser.Scene {
     constructor() {
@@ -25,21 +26,37 @@ export default class MenuScene extends Phaser.Scene {
         // Top Information Bar (Credits & Stars)
         this.createTopHUD();
 
-        // Main Title
-        const title = this.add.text(centerX, centerY - 350, 'PUZZLE\nJOURNEY', {
+        // Main Title and Tagline Container
+        const titleContainer = this.add.container(centerX, centerY - 320);
+
+        const titleText = this.add.text(0, -35, 'REBOUND', {
             fontFamily: 'Fredoka',
-            fontSize: '140px',
+            fontSize: '110px',
             color: '#3a3a4a',
             align: 'center',
             fontStyle: '700',
-            lineSpacing: 10
+            letterSpacing: 4
         }).setOrigin(0.5);
-        title.setShadow(0, 15, 'rgba(0,0,0,0.06)', 0);
+        titleText.setShadow(0, 15, 'rgba(0,0,0,0.06)', 0);
 
-        // Gentle floating animation
+        const taglineText = this.add.text(0, 45, 'THE ART OF RICOCHET', {
+            fontFamily: 'Fredoka',
+            fontSize: '32px',
+            color: '#6085e0',
+            align: 'center',
+            fontStyle: '700'
+        }).setOrigin(0.5);
+        taglineText.setShadow(0, 5, 'rgba(0,0,0,0.04)', 0);
+
+        // Force tagline to be parallel and exactly equal in width to the game name
+        taglineText.setDisplaySize(titleText.displayWidth, taglineText.displayHeight);
+
+        titleContainer.add([titleText, taglineText]);
+
+        // Gentle floating animation for title container
         this.tweens.add({
-            targets: title,
-            y: title.y - 25,
+            targets: titleContainer,
+            y: titleContainer.y - 20,
             duration: 3500,
             ease: 'Sine.inOut',
             yoyo: true,
@@ -47,17 +64,18 @@ export default class MenuScene extends Phaser.Scene {
         });
 
         // Core interactive UI
-        new Button(this, centerX, centerY + 100, 'PLAY', () => {
+        new Button(this, centerX, centerY + 30, 'PLAY', () => {
             SceneManager.transitionTo(this, 'GameScene');
-        }, { width: 420, height: 110, icon: 'icon_play', bgColor: 0x6085e0, fontSize: '40px' });
+        }, { width: 420, height: 100, icon: 'icon_play', bgColor: 0x6085e0, fontSize: '40px' });
 
-        // Bottom Settings Button
-        new Button(this, 120, height - 100, '', () => {
-            console.log('Settings opened');
-        }, { width: 100, height: 100, icon: 'icon_settings', bgColor: 0xe0e0e8 });
+        // Level Select Button
+        new Button(this, centerX, centerY + 150, 'SELECT LEVEL', () => {
+            SceneManager.transitionTo(this, 'LevelSelectScene');
+        }, { width: 420, height: 90, icon: 'icon_settings', bgColor: 0xffffff, fontSize: '32px' });
+
 
         // Version Label
-        this.add.text(width - 40, height - 40, 'v0.2.0-beta', {
+        this.add.text(width - 40, height - 40, 'v0.2.1-beta', {
             fontFamily: 'Fredoka',
             fontSize: '28px',
             color: '#b0b0b8',
@@ -88,17 +106,17 @@ export default class MenuScene extends Phaser.Scene {
         creditsContainer.add([bgCredits, coinIcon, creditsText]);
 
         // Stars Pill
-        const starsContainer = this.add.container(this.cameras.main.width - paddingX - 80, yPos);
+        const starsContainer = this.add.container(this.cameras.main.width - paddingX - 100, yPos);
         const bgStars = this.add.graphics();
         bgStars.fillStyle(0xffffff, 1);
-        bgStars.fillRoundedRect(-100, -35, 200, 70, 35);
+        bgStars.fillRoundedRect(-110, -35, 220, 70, 35);
         bgStars.lineStyle(2, 0xe0e0e8, 1);
-        bgStars.strokeRoundedRect(-100, -35, 200, 70, 35);
+        bgStars.strokeRoundedRect(-110, -35, 220, 70, 35);
         
-        const starIcon = this.add.image(-60, 0, 'icon_star').setScale(0.45);
-        const starsText = this.add.text(20, 0, `0 / 30`, {
+        const starIcon = this.add.image(-70, 0, 'icon_star').setScale(0.45);
+        const starsText = this.add.text(15, 0, `${ProgressManager.getTotalStars()} / 150`, {
             fontFamily: 'Fredoka',
-            fontSize: '32px',
+            fontSize: '26px',
             color: '#3a3a4a',
             fontStyle: '700'
         }).setOrigin(0.5);

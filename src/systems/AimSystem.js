@@ -24,6 +24,7 @@ export default class AimSystem {
         this.isAiming = true;
         this.dragStart.set(pointer.x, pointer.y);
         this.dragCurrent.set(pointer.x, pointer.y);
+        this.scene.events.emit('aim_start');
         
         this.scene.tweens.add({
             targets: this.ball,

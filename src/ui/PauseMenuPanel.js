@@ -19,7 +19,7 @@ export default class PauseMenuPanel extends Phaser.GameObjects.Container {
 
         // Panel Background
         const panelWidth = 560;
-        const panelHeight = 680;
+        const panelHeight = 760;
         const radius = 30;
         
         const shadow = scene.add.graphics();
@@ -37,7 +37,7 @@ export default class PauseMenuPanel extends Phaser.GameObjects.Container {
         this.add([shadow, bg, stroke]);
 
         // Title
-        const title = scene.add.text(0, -220, 'PAUSED', {
+        const title = scene.add.text(0, -260, 'PAUSED', {
             fontFamily: 'Fredoka',
             fontSize: '56px',
             color: '#3a3a4a',
@@ -48,19 +48,19 @@ export default class PauseMenuPanel extends Phaser.GameObjects.Container {
         // Buttons
         const btnWidth = 420;
         
-        const btnResume = new Button(scene, 0, -80, 'RESUME', () => {
+        const btnResume = new Button(scene, 0, -130, 'RESUME', () => {
             this.close();
         }, { width: btnWidth, bgColor: 0x6085e0, icon: 'icon_play' });
         
-        const btnRestart = new Button(scene, 0, 40, 'RESTART', () => {
+        const btnRestart = new Button(scene, 0, -10, 'RESTART', () => {
             this.close(() => {
                 const attempts = scene.registry.get('level_attempts_' + scene.levelId) || 0;
                 scene.registry.set('level_attempts_' + scene.levelId, attempts + 1);
-                SceneManager.transitionTo(scene, 'GameScene');
+                SceneManager.transitionTo(scene, 'GameScene', { levelId: scene.overrideLevelId });
             });
         }, { width: btnWidth, bgColor: 0x9090a0, icon: 'icon_retry' });
         
-        const btnSkip = new Button(scene, 0, 160, 'SKIP (2)', () => {
+        const btnSkip = new Button(scene, 0, 110, 'SKIP (2)', () => {
             if (CreditManager.has(2)) {
                 this.showConfirmSkip();
             } else {
@@ -68,7 +68,7 @@ export default class PauseMenuPanel extends Phaser.GameObjects.Container {
             }
         }, { width: btnWidth, bgColor: 0xe0b060, icon: 'icon_fastforward' });
 
-        const btnHome = new Button(scene, 0, 280, 'HOME', () => {
+        const btnHome = new Button(scene, 0, 230, 'HOME', () => {
             this.close(() => {
                 SceneManager.transitionTo(scene, 'MenuScene');
             });
@@ -122,7 +122,7 @@ export default class PauseMenuPanel extends Phaser.GameObjects.Container {
             CreditManager.spend(2);
             GameManager.completeLevel();
             this.close(() => {
-                SceneManager.transitionTo(this.scene, 'GameScene');
+                SceneManager.transitionTo(this.scene, 'GameScene', { levelId: this.scene.overrideLevelId ? null : GameManager.currentLevel });
             });
         }, { width: 200, bgColor: 0x6085e0 });
         

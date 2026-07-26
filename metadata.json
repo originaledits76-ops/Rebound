@@ -1,6 +1,6 @@
 {
-  "name": "Puzzle Journey",
-  "description": "A commercial-quality HTML5 puzzle game built with Phaser 3.",
+  "name": "REBOUND",
+  "description": "REBOUND - The Art of Ricochet: A commercial-quality physics puzzle game built with Phaser 3.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

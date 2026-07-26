@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "levelRequest": {
+      "title": "Level Request",
+      "description": "User custom level request",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "User's name"
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "User's email ID"
+        },
+        "request": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Custom level request details"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Submission timestamp"
+        }
+      },
+      "required": ["name", "email", "request", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/level_requests/{requestId}": {
+      "schema": "levelRequest",
+      "description": "Custom level requests from players"
+    }
+  }
+}

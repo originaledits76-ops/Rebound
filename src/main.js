@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import BootScene from './scenes/BootScene.js';
 import MenuScene from './scenes/MenuScene.js';
+import LevelSelectScene from './scenes/LevelSelectScene.js';
 import GameScene from './scenes/GameScene.js';
 
 const isMobile = window.innerWidth < 768;
@@ -24,9 +25,14 @@ const config = {
             debug: false // Production-ready: no debug overlays
         }
     },
-    scene: [BootScene, MenuScene, GameScene]
+    scene: [BootScene, MenuScene, LevelSelectScene, GameScene]
 };
 
-document.fonts.ready.then(() => {
+
+
+Promise.all([
+    document.fonts.load('16px "Material Symbols Rounded"'),
+    document.fonts.load('16px Fredoka')
+]).then(() => {
     const game = new Phaser.Game(config);
 });

@@ -114,7 +114,7 @@ export default class LevelCompletePanel extends Phaser.GameObjects.Container {
             }).setOrigin(0.5);
             this.add(title);
 
-            const retryBtn = new Button(scene, 0, 80, 'RETRY LEVEL', () => onAction('retry'), { width: 340, bgColor: 0x6085e0, icon: 'icon_retry' });
+            const retryBtn = new Button(scene, 0, 80, 'RETRY', () => onAction('retry'), { width: 340, bgColor: 0x6085e0, icon: 'icon_retry' });
             const menuBtn = new Button(scene, 0, 200, 'HOME', () => onAction('menu'), { width: 340, bgColor: 0x9090a0, icon: 'icon_home' });
             this.add([retryBtn, menuBtn]);
         }

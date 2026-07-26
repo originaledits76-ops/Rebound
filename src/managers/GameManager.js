@@ -1,20 +1,23 @@
-import SaveManager from './SaveManager.js';
+import ProgressManager from './ProgressManager.js';
 
 class GameManager {
     constructor() {
-        this.progress = SaveManager.get('progress');
+        this.activeLevelId = 1;
     }
 
-    get currentLevel() { return this.progress.level; }
-    
-    completeLevel() {
-        this.progress.level++;
-        SaveManager.set('progress', this.progress);
+    get currentLevel() {
+        return this.activeLevelId || ProgressManager.getLastPlayed();
     }
 
-    resetProgress() {
-        this.progress.level = 1;
-        SaveManager.set('progress', this.progress);
+    setCurrentLevel(levelId) {
+        this.activeLevelId = levelId;
+    }
+
+    completeLevel(shotsTaken = 1) {
+        if (typeof this.activeLevelId === 'number') {
+            ProgressManager.recordLevelComplete(this.activeLevelId, shotsTaken);
+            this.activeLevelId++;
+        }
     }
 }
 

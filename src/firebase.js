@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
     projectId: "substantial-scholar-5nzsc",
@@ -13,18 +13,35 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, "ai-studio-puzzcoreframewor-580a6dbf-65dc-4d57-959f-bacbeddc8d91");
 
-
-// Helper methods for levels
-export async function getCampaignLevel(levelId) {
+// Helper methods reserved ONLY for future community levels
+export async function saveCustomLevel(levelData) {
     try {
-        const docRef = doc(db, 'campaign_levels', levelId.toString());
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            return docSnap.data();
-        }
-        return null;
+        const levelId = levelData.id || 'custom_' + Date.now();
+        const docRef = doc(db, 'custom_levels', levelId.toString());
+        const payload = {
+            ...levelData,
+            id: levelId,
+            updatedAt: new Date().toISOString()
+        };
+        await setDoc(docRef, payload);
+        return { success: true, id: levelId };
     } catch (e) {
-        console.error("Error fetching campaign level:", e);
-        return null;
+        console.warn('Firebase save failed, fallback to local storage:', e);
+        return { success: false, id: levelData.id || 'custom_' + Date.now(), error: e };
+    }
+}
+
+export async function getCustomLevels() {
+    try {
+        const colRef = collection(db, 'custom_levels');
+        const querySnap = await getDocs(colRef);
+        const levels = [];
+        querySnap.forEach((doc) => {
+            levels.push(doc.data());
+        });
+        return levels;
+    } catch (e) {
+        console.warn('Firebase fetch custom levels failed:', e);
+        return [];
     }
 }

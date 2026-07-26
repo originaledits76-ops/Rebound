@@ -2,14 +2,10 @@ import Phaser from 'phaser';
 
 export default class Hole extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y) {
-        super(scene.matter.world, x, y, 'portal_exit');
+        super(scene.matter.world, x, y, 'hole_goal');
         scene.add.existing(this);
         
         this.setDisplaySize(90, 90); // Slightly larger than hitbox
-        
-        // Shadow for hole
-        const shadow = scene.add.circle(x, y + 15, 45, 0xd0d0d8, 0.6);
-        shadow.setDepth(-3);
         
         // Slightly larger circle for forgiveness
         this.setCircle(35); 
@@ -17,9 +13,12 @@ export default class Hole extends Phaser.Physics.Matter.Sprite {
         this.setStatic(true);
         this.setDepth(-2);
         
+        // Debug Color: Orange
+        this.setTint(0xf97316);
+        
         // Soft pulse animation
         scene.tweens.add({
-            targets: [this, shadow],
+            targets: this,
             scaleX: 1.05,
             scaleY: 1.05,
             duration: 1500,
