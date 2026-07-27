@@ -18,6 +18,7 @@ import EndOfLevelsModal from '../ui/EndOfLevelsModal.js';
 import CustomLevelRequestModal from '../ui/CustomLevelRequestModal.js';
 import DebugOverlay from '../ui/DebugOverlay.js';
 import defaultCampaignArray from '../data/LevelData.js';
+import { gameplayStart, gameplayStop, happytime, trackGameActionForAds } from '../managers/CrazyGamesManager.js';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -197,6 +198,7 @@ export default class GameScene extends Phaser.Scene {
         this.matter.world.on('collisionstart', this.handleCollision, this);
 
         this.state = 'IDLE';
+        gameplayStart();
         this.showTutorial(level);
     }
 
@@ -411,9 +413,11 @@ export default class GameScene extends Phaser.Scene {
     showRetryButton() {
         if (!this.retryBtnHUD) {
             this.retryBtnHUD = new Button(this, this.cameras.main.width / 2, this.cameras.main.height - 120, 'RESTART LEVEL', () => {
-                const attempts = this.registry.get('level_attempts_' + this.levelId) || 0;
-                this.registry.set('level_attempts_' + this.levelId, attempts + 1);
-                SceneManager.transitionTo(this, 'GameScene', { levelId: this.overrideLevelId });
+                trackGameActionForAds(() => {
+                    const attempts = this.registry.get('level_attempts_' + this.levelId) || 0;
+                    this.registry.set('level_attempts_' + this.levelId, attempts + 1);
+                    SceneManager.transitionTo(this, 'GameScene', { levelId: this.overrideLevelId });
+                });
             }, { width: 320, bgColor: 0x9090a0 });
             this.retryBtnHUD.setDepth(150);
             this.add.existing(this.retryBtnHUD);
@@ -532,6 +536,10 @@ export default class GameScene extends Phaser.Scene {
 
     triggerWin() {
         this.state = 'WIN';
+        gameplayStop();
+        if (this.shots === 1) {
+            happytime();
+        }
         if (this.timerEvent) {
             this.timerEvent.destroy();
             this.timerEvent = null;
@@ -615,6 +623,7 @@ export default class GameScene extends Phaser.Scene {
 
     triggerLose(reason = 'OUT OF BOUNDS') {
         this.state = 'LOSE';
+        gameplayStop();
         
         AudioManager.playSFX('lose');
         

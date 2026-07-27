@@ -104,13 +104,7 @@ export default class Button extends Phaser.GameObjects.Container {
 
         let iconTint = options.iconTint;
         if (iconTint === undefined) {
-            if (textColor && textColor !== '#111111' && textColor !== '#3a3a4a' && textColor !== '#000000') {
-                iconTint = parseHex(textColor, 0xffffff);
-            } else if (bgColor && bgColor !== 0xffffff) {
-                iconTint = 0xffffff;
-            } else {
-                iconTint = 0x3a3a4a;
-            }
+            iconTint = 0x000000;
         }
 
         if (targetIconKey && !text) {
@@ -119,7 +113,7 @@ export default class Button extends Phaser.GameObjects.Container {
             this.iconImg = scene.add.image(0, 0, targetIconKey);
             this.iconImg.setDisplaySize(iconSize, iconSize);
             if (targetIconKey !== 'icon_star' && targetIconKey !== 'icon_coin') {
-                this.iconImg.setTint(iconTint);
+                this.iconImg.setTint(0x000000);
             }
             elements.push(this.iconImg);
             this.animatableContent.push(this.iconImg);
@@ -129,7 +123,7 @@ export default class Button extends Phaser.GameObjects.Container {
             this.iconImg = scene.add.image(0, 0, targetIconKey);
             this.iconImg.setDisplaySize(iconSize, iconSize);
             if (targetIconKey !== 'icon_star' && targetIconKey !== 'icon_coin') {
-                this.iconImg.setTint(iconTint);
+                this.iconImg.setTint(0x000000);
             }
 
             this.label = scene.add.text(0, 0, text, {

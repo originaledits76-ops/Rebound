@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import Button from '../ui/Button.js';
 import AudioManager from '../managers/AudioManager.js';
 import SceneManager from '../managers/SceneManager.js';
-import CreditManager from '../managers/CreditManager.js';
 import ProgressManager from '../managers/ProgressManager.js';
 
 export default class MenuScene extends Phaser.Scene {
@@ -23,7 +22,7 @@ export default class MenuScene extends Phaser.Scene {
         this.add.tileSprite(0, 0, width, height, 'bg_grid').setOrigin(0).setDepth(-10);
         this.createBackgroundParticles();
 
-        // Top Information Bar (Credits & Stars)
+        // Top Information Bar (Stars)
         this.createTopHUD();
 
         // Main Title and Tagline Container
@@ -41,15 +40,13 @@ export default class MenuScene extends Phaser.Scene {
 
         const taglineText = this.add.text(0, 45, 'THE ART OF RICOCHET', {
             fontFamily: 'Fredoka',
-            fontSize: '32px',
+            fontSize: '24px',
             color: '#6085e0',
             align: 'center',
-            fontStyle: '700'
+            fontStyle: '700',
+            letterSpacing: 5
         }).setOrigin(0.5);
         taglineText.setShadow(0, 5, 'rgba(0,0,0,0.04)', 0);
-
-        // Force tagline to be parallel and exactly equal in width to the game name
-        taglineText.setDisplaySize(titleText.displayWidth, taglineText.displayHeight);
 
         titleContainer.add([titleText, taglineText]);
 
@@ -87,24 +84,6 @@ export default class MenuScene extends Phaser.Scene {
         const yPos = 80;
         const paddingX = 40;
         
-        // Credits Pill
-        const creditsContainer = this.add.container(paddingX + 80, yPos);
-        const bgCredits = this.add.graphics();
-        bgCredits.fillStyle(0xffffff, 1);
-        bgCredits.fillRoundedRect(-100, -35, 200, 70, 35);
-        bgCredits.lineStyle(2, 0xe0e0e8, 1);
-        bgCredits.strokeRoundedRect(-100, -35, 200, 70, 35);
-        
-        const coinIcon = this.add.image(-60, 0, 'icon_coin').setScale(0.5);
-        const creditsText = this.add.text(20, 0, `${CreditManager.getCredits()}`, {
-            fontFamily: 'Fredoka',
-            fontSize: '32px',
-            color: '#3a3a4a',
-            fontStyle: '700'
-        }).setOrigin(0.5);
-        
-        creditsContainer.add([bgCredits, coinIcon, creditsText]);
-
         // Stars Pill
         const starsContainer = this.add.container(this.cameras.main.width - paddingX - 100, yPos);
         const bgStars = this.add.graphics();

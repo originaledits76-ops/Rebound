@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Button from './Button.js';
 import SceneManager from '../managers/SceneManager.js';
 import GameManager from '../managers/GameManager.js';
+import { playRewardedAd } from '../managers/CrazyGamesManager.js';
 
 export default class SkipLevelPanel extends Phaser.GameObjects.Container {
     constructor(scene, onClose) {
@@ -82,45 +83,15 @@ export default class SkipLevelPanel extends Phaser.GameObjects.Container {
     }
 
     playRewardedAd(scene) {
-        // Create full screen ad simulation overlay
-        const width = scene.cameras.main.width;
-        const height = scene.cameras.main.height;
-
-        const adBg = scene.add.rectangle(0, 0, width * 2, height * 2, 0x000000, 0.92);
-        const adTitle = scene.add.text(0, -60, 'REWARDED AD PLAYING...', {
-            fontFamily: 'Fredoka',
-            fontSize: '36px',
-            color: '#ffffff',
-            fontStyle: '700'
-        }).setOrigin(0.5);
-
-        const adTimerText = scene.add.text(0, 20, 'Reward in 2s', {
-            fontFamily: 'Fredoka',
-            fontSize: '30px',
-            color: '#ffd700',
-            fontStyle: '600'
-        }).setOrigin(0.5);
-
-        const adContainer = scene.add.container(0, 0, [adBg, adTitle, adTimerText]);
-        this.add(adContainer);
-
-        let countdown = 2;
-        const interval = scene.time.addEvent({
-            delay: 1000,
-            repeat: 1,
-            callback: () => {
-                countdown--;
-                if (countdown > 0) {
-                    adTimerText.setText(`Reward in ${countdown}s`);
-                } else {
-                    adTimerText.setText('SKIPPING LEVEL...');
-                    scene.time.delayedCall(500, () => {
-                        GameManager.completeLevel(1);
-                        SceneManager.transitionTo(scene, 'GameScene', { levelId: GameManager.currentLevel });
-                    });
-                }
+        playRewardedAd(
+            () => {
+                GameManager.completeLevel(1);
+                SceneManager.transitionTo(scene, 'GameScene', { levelId: GameManager.currentLevel });
+            },
+            (error) => {
+                console.warn("Rewarded ad failed or was dismissed:", error);
             }
-        });
+        );
     }
 
     close(callback) {

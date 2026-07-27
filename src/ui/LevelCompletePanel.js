@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import Button from './Button.js';
+import { trackGameActionForAds } from '../managers/CrazyGamesManager.js';
 
 export default class LevelCompletePanel extends Phaser.GameObjects.Container {
     constructor(scene, isWin, shots, onAction, loseReason = 'OUT OF BOUNDS') {
@@ -100,8 +101,12 @@ export default class LevelCompletePanel extends Phaser.GameObjects.Container {
                 }
             }
             
-            const menuBtn = new Button(scene, -150, 180, 'HOME', () => onAction('menu'), { width: 260, bgColor: 0x9090a0, icon: 'icon_home' });
-            const nextBtn = new Button(scene, 150, 180, 'NEXT', () => onAction('next'), { width: 260, bgColor: 0x6085e0, icon: 'icon_play' });
+            const menuBtn = new Button(scene, -150, 180, 'HOME', () => {
+                trackGameActionForAds(() => onAction('menu'));
+            }, { width: 260, bgColor: 0x9090a0, icon: 'icon_home' });
+            const nextBtn = new Button(scene, 150, 180, 'NEXT', () => {
+                trackGameActionForAds(() => onAction('next'));
+            }, { width: 260, bgColor: 0x6085e0, icon: 'icon_play' });
             this.add([menuBtn, nextBtn]);
             
         } else {
@@ -114,8 +119,12 @@ export default class LevelCompletePanel extends Phaser.GameObjects.Container {
             }).setOrigin(0.5);
             this.add(title);
 
-            const retryBtn = new Button(scene, 0, 80, 'RETRY', () => onAction('retry'), { width: 340, bgColor: 0x6085e0, icon: 'icon_retry' });
-            const menuBtn = new Button(scene, 0, 200, 'HOME', () => onAction('menu'), { width: 340, bgColor: 0x9090a0, icon: 'icon_home' });
+            const retryBtn = new Button(scene, 0, 80, 'RETRY', () => {
+                trackGameActionForAds(() => onAction('retry'));
+            }, { width: 340, bgColor: 0x6085e0, icon: 'icon_retry' });
+            const menuBtn = new Button(scene, 0, 200, 'HOME', () => {
+                trackGameActionForAds(() => onAction('menu'));
+            }, { width: 340, bgColor: 0x9090a0, icon: 'icon_home' });
             this.add([retryBtn, menuBtn]);
         }
 

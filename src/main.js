@@ -3,6 +3,10 @@ import BootScene from './scenes/BootScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import LevelSelectScene from './scenes/LevelSelectScene.js';
 import GameScene from './scenes/GameScene.js';
+import { initCrazyGamesSDK } from './managers/CrazyGamesManager.js';
+
+// Initialize CrazyGames SDK v3 early
+initCrazyGamesSDK();
 
 const isMobile = window.innerWidth < 768;
 const logicalWidth = 1080;
@@ -28,11 +32,19 @@ const config = {
     scene: [BootScene, MenuScene, LevelSelectScene, GameScene]
 };
 
-
-
-Promise.all([
-    document.fonts.load('16px "Material Symbols Rounded"'),
-    document.fonts.load('16px Fredoka')
-]).then(() => {
+async function initApp() {
+    try {
+        if (document.fonts) {
+            await Promise.all([
+                document.fonts.load('16px Fredoka').catch(() => {}),
+                document.fonts.load('16px "Material Symbols Rounded"').catch(() => {})
+            ]);
+        }
+    } catch (e) {
+        console.warn('Font loading fallback:', e);
+    }
     const game = new Phaser.Game(config);
-});
+    window.game = game;
+}
+
+initApp();

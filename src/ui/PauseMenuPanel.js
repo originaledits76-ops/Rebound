@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import Button from './Button.js';
 import SceneManager from '../managers/SceneManager.js';
-import CreditManager from '../managers/CreditManager.js';
 import GameManager from '../managers/GameManager.js';
+import { gameplayStart, gameplayStop, playRewardedAd, trackGameActionForAds } from '../managers/CrazyGamesManager.js';
 
 export default class PauseMenuPanel extends Phaser.GameObjects.Container {
     constructor(scene) {
@@ -12,6 +12,8 @@ export default class PauseMenuPanel extends Phaser.GameObjects.Container {
         
         scene.add.existing(this);
         this.setDepth(300);
+
+        gameplayStop();
         
         // Blur/dim background
         this.overlay = scene.add.rectangle(0, 0, width * 2, height * 2, 0xfafafc, 0.85);
@@ -49,28 +51,39 @@ export default class PauseMenuPanel extends Phaser.GameObjects.Container {
         const btnWidth = 420;
         
         const btnResume = new Button(scene, 0, -130, 'RESUME', () => {
+            gameplayStart();
             this.close();
         }, { width: btnWidth, bgColor: 0x6085e0, icon: 'icon_play' });
         
         const btnRestart = new Button(scene, 0, -10, 'RESTART', () => {
-            this.close(() => {
-                const attempts = scene.registry.get('level_attempts_' + scene.levelId) || 0;
-                scene.registry.set('level_attempts_' + scene.levelId, attempts + 1);
-                SceneManager.transitionTo(scene, 'GameScene', { levelId: scene.overrideLevelId });
+            trackGameActionForAds(() => {
+                this.close(() => {
+                    const attempts = scene.registry.get('level_attempts_' + scene.levelId) || 0;
+                    scene.registry.set('level_attempts_' + scene.levelId, attempts + 1);
+                    SceneManager.transitionTo(scene, 'GameScene', { levelId: scene.overrideLevelId });
+                });
             });
         }, { width: btnWidth, bgColor: 0x9090a0, icon: 'icon_retry' });
         
-        const btnSkip = new Button(scene, 0, 110, 'SKIP (2)', () => {
-            if (CreditManager.has(2)) {
-                this.showConfirmSkip();
-            } else {
-                this.showAdPopup();
-            }
+        const btnSkip = new Button(scene, 0, 110, 'SKIP LEVEL', () => {
+            playRewardedAd(
+                () => {
+                    GameManager.completeLevel(1);
+                    this.close(() => {
+                        SceneManager.transitionTo(scene, 'GameScene', { levelId: scene.overrideLevelId ? null : GameManager.currentLevel });
+                    });
+                },
+                (err) => {
+                    console.warn("Rewarded ad failed or was dismissed:", err);
+                }
+            );
         }, { width: btnWidth, bgColor: 0xe0b060, icon: 'icon_fastforward' });
 
         const btnHome = new Button(scene, 0, 230, 'HOME', () => {
-            this.close(() => {
-                SceneManager.transitionTo(scene, 'MenuScene');
+            trackGameActionForAds(() => {
+                this.close(() => {
+                    SceneManager.transitionTo(scene, 'MenuScene');
+                });
             });
         }, { width: btnWidth, bgColor: 0x9090a0, icon: 'icon_home' });
 
@@ -106,65 +119,6 @@ export default class PauseMenuPanel extends Phaser.GameObjects.Container {
             onComplete: () => {
                 if (callback) callback();
                 this.destroy();
-            }
-        });
-    }
-
-    showConfirmSkip() {
-        const confirmText = this.scene.add.text(0, -60, 'Spend 2 Credits\nto skip this level?', {
-            fontFamily: 'Fredoka',
-            fontSize: '40px',
-            color: '#3a3a4a',
-            align: 'center'
-        }).setOrigin(0.5);
-        
-        const btnYes = new Button(this.scene, -110, 120, 'YES', () => {
-            CreditManager.spend(2);
-            GameManager.completeLevel();
-            this.close(() => {
-                SceneManager.transitionTo(this.scene, 'GameScene', { levelId: this.scene.overrideLevelId ? null : GameManager.currentLevel });
-            });
-        }, { width: 200, bgColor: 0x6085e0 });
-        
-        const btnNo = new Button(this.scene, 110, 120, 'NO', () => {
-            this.close();
-        }, { width: 200, bgColor: 0x9090a0 });
-        
-        const confirmContainer = this.scene.add.container(0, 0, [confirmText, btnYes, btnNo]);
-        this.add(confirmContainer);
-        
-        this.list.forEach(c => {
-            if (c !== this.overlay && c !== confirmContainer && !(c instanceof Phaser.GameObjects.Graphics)) {
-                c.setVisible(false);
-            }
-        });
-    }
-
-    showAdPopup() {
-        const adText = this.scene.add.text(0, -80, 'Not enough credits.\nWatch an Ad?\n+2', {
-            fontFamily: 'Fredoka',
-            fontSize: '40px',
-            color: '#3a3a4a',
-            align: 'center'
-        }).setOrigin(0.5);
-
-        const coinIcon = this.scene.add.image(60, -20, 'icon_coin').setScale(0.6);
-        
-        const btnAd = new Button(this.scene, 0, 80, 'WATCH AD', () => {
-            CreditManager.add(2);
-            this.close();
-        }, { width: 380, bgColor: 0x70b880 });
-        
-        const btnCancel = new Button(this.scene, 0, 200, 'CANCEL', () => {
-            this.close();
-        }, { width: 380, bgColor: 0x9090a0 });
-        
-        const adContainer = this.scene.add.container(0, 0, [adText, coinIcon, btnAd, btnCancel]);
-        this.add(adContainer);
-        
-        this.list.forEach(c => {
-            if (c !== this.overlay && c !== adContainer && !(c instanceof Phaser.GameObjects.Graphics)) {
-                c.setVisible(false);
             }
         });
     }

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import AssetLoader from '../utils/AssetLoader.js';
+import { onAssetsLoaded } from '../managers/CrazyGamesManager.js';
 
 export default class BootScene extends Phaser.Scene {
     constructor() {
@@ -96,6 +97,7 @@ export default class BootScene extends Phaser.Scene {
         // Wait a frame to ensure fonts are fully applied
         this.time.delayedCall(100, () => {
             this.generateAllTextures();
+            onAssetsLoaded();
             this.scene.start('MenuScene');
         });
     }
@@ -306,8 +308,8 @@ export default class BootScene extends Phaser.Scene {
             }
 
             const g = this.make.graphics({ add: false });
-            g.fillStyle(0xffffff, 1);
-            g.lineStyle(8, 0xffffff, 1);
+            g.fillStyle(0x000000, 1);
+            g.lineStyle(8, 0x000000, 1);
 
             if (key.includes('play') || key.includes('check')) {
                 g.beginPath();
