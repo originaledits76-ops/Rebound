@@ -3,10 +3,7 @@ import BootScene from './scenes/BootScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import LevelSelectScene from './scenes/LevelSelectScene.js';
 import GameScene from './scenes/GameScene.js';
-import { initCrazyGamesSDK } from './managers/CrazyGamesManager.js';
-
-// Initialize CrazyGames SDK v3 early
-initCrazyGamesSDK();
+import CrazyGamesManager from './managers/CrazyGamesManager.js';
 
 const isMobile = window.innerWidth < 768;
 const logicalWidth = 1080;
@@ -33,6 +30,10 @@ const config = {
 };
 
 async function initApp() {
+    // 1. Initialize CrazyGames SDK safely without blocking game creation
+    await CrazyGamesManager.initialize();
+
+    // 2. Load web fonts
     try {
         if (document.fonts) {
             await Promise.all([
@@ -43,8 +44,14 @@ async function initApp() {
     } catch (e) {
         console.warn('Font loading fallback:', e);
     }
+
+    // 3. Create Phaser Game
+    console.log("Creating Phaser Game...");
     const game = new Phaser.Game(config);
     window.game = game;
+    console.log("Game Ready");
 }
 
 initApp();
+
+
